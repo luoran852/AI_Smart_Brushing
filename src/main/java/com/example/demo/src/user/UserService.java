@@ -37,7 +37,7 @@ public class UserService {
 
     //POST
     public PostUserRes createUser(PostUserReq postUserReq) throws BaseException {
-        //중복
+        // 이메일 중복 체크
         if(userProvider.checkEmail(postUserReq.getEmail()) ==1){
             throw new BaseException(POST_USERS_EXISTS_EMAIL);
         }
@@ -51,7 +51,9 @@ public class UserService {
             throw new BaseException(PASSWORD_ENCRYPTION_ERROR);
         }
         try{
-            int userIdx = userDao.createUser(postUserReq);
+            // 다시 복호화한 비밀번호
+            String rawPwd = new AES128(Secret.USER_INFO_PASSWORD_KEY).decrypt(postUserReq.getPwd());
+            int userIdx = userDao.createUser(postUserReq, rawPwd);
             //jwt 발급.
             String jwt = jwtService.createJwt(userIdx);
             return new PostUserRes(jwt,userIdx);

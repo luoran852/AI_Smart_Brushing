@@ -9,11 +9,8 @@ import com.example.demo.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 
 import static com.example.demo.config.BaseResponseStatus.*;
-import static com.example.demo.config.BaseResponseStatus.POST_USERS_INVALID_PASSWORD;
 import static com.example.demo.utils.ValidationRegex.isRegexEmail;
 import static com.example.demo.utils.ValidationRegex.isRegexPwd;
 
@@ -93,12 +90,12 @@ public class UserController {
         if(postUserReq.getEmail() == null){
             return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
         }
-        //이메일 정규표현
+        // 이메일 정규표현
         if(!isRegexEmail(postUserReq.getEmail())){
             return new BaseResponse<>(POST_USERS_INVALID_EMAIL);
         }
 
-        //비밀번호 정규표현 (최소 8 자, 최소 하나의 문자, 하나의 숫자 및 하나의 특수 문자)
+        // 비밀번호 정규표현 (최소 8자, 최소 하나의 문자, 하나의 숫자 및 하나의 특수 문자)
         if(!isRegexPwd(postUserReq.getPwd())){
             return new BaseResponse<>(POST_USERS_INVALID_PASSWORD);
         }
@@ -119,8 +116,17 @@ public class UserController {
     @PostMapping("/logIn")
     public BaseResponse<PostLoginRes> logIn(@RequestBody PostLoginReq postLoginReq){
         try{
-            // TODO: 로그인 값들에 대한 형식적인 validatin 처리해주셔야합니다!
+            // TODO: 로그인 값들에 대한 형식적인 validation 처리해주셔야합니다!
             // TODO: 유저의 status ex) 비활성화된 유저, 탈퇴한 유저 등을 관리해주고 있다면 해당 부분에 대한 validation 처리도 해주셔야합니다.
+
+            // 이메일, 비번 빈값 체크
+            if (postLoginReq.getEmail().equals("")){
+                return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
+            }
+            if (postLoginReq.getPwd().equals("")){
+                return new BaseResponse<>(POST_USERS_EMPTY_PASSWORD);
+            }
+
             PostLoginRes postLoginRes = userProvider.logIn(postLoginReq);
             return new BaseResponse<>(postLoginRes);
         } catch (BaseException exception){
@@ -155,7 +161,7 @@ public class UserController {
 //    }
 
     /**
-     * 유저 피드백 조회
+     * 유저 피드백 조회 - test용
      * [GET] /users/feedback/:userIdx
      * @return BaseResponse<GetUserFeedbackRes>
      */
@@ -167,6 +173,44 @@ public class UserController {
         try{
             GetUserFeedbackRes getUserFeedbackRes = userProvider.getUserFeedback(userIdx);
             return new BaseResponse<>(getUserFeedbackRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+
+    }
+
+    /**
+     * 유저 피드백 조회 (아침, 점심, 저녁)
+     * [GET] /users/feedback/time?type=1
+     * @return BaseResponse<GetUserFeedbackDateRes>
+     */
+    // Query String
+    @ResponseBody
+    @GetMapping("/feedback/time") // (GET) 58.122.17.193:9000/users/feedback/time?type=1
+    public BaseResponse<GetUserFeedbackDateRes> getUserFeedbackDate(@RequestBody GetUserFeedbackDateReq getUserFeedbackDateReq, @RequestParam int type) {
+        try{
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+
+            GetUserFeedbackDateRes getUserFeedbackDateRes = userProvider.getUserFeedbackDate(getUserFeedbackDateReq, userIdxByJwt, type);
+            return new BaseResponse<>(getUserFeedbackDateRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 날짜 별 세부 결과 조회
+     * [GET] /users/feedback/detail
+     * @return BaseResponse<GetUserFeedbackDetailRes>
+     */
+    // Query String
+    @ResponseBody
+    @GetMapping("/feedback/detail") // (GET) 58.122.17.193:9000/users/feedback/detail?idx=1
+    public BaseResponse<GetUserFeedbackDetailRes> getUserFeedbackDetail(@RequestParam int idx) {
+        try{
+            GetUserFeedbackDetailRes getUserFeedbackDetailRes = userProvider.getUserFeedbackDetail(idx);
+            return new BaseResponse<>(getUserFeedbackDetailRes);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }

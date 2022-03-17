@@ -7,9 +7,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class GetUserFeedbackRes {
-    private int idx;
-    private int userIdx;
+public class GetUserFeedbackDetailRes {
+    private String brushDate;
+    private String brushTime;
+    private int score;
     private String feedbackMsg;
-    private String mappingVideoUrl;
 }

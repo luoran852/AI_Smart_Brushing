@@ -98,4 +98,23 @@ public class UserProvider {
         }
     }
 
+    public GetUserFeedbackDateRes getUserFeedbackDate(GetUserFeedbackDateReq getUserFeedbackDateReq, int userIdxByJwt, int type) throws BaseException {
+        try {
+            GetUserFeedbackDateRes getUserFeedbackDateRes = userDao.getUserFeedbackDate(getUserFeedbackDateReq, userIdxByJwt, type);
+            return getUserFeedbackDateRes;
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    public GetUserFeedbackDetailRes getUserFeedbackDetail(int idx) throws BaseException {
+        try {
+            GetUserFeedbackDetailRes getUserFeedbackDetailRes = userDao.getUserFeedbackDetail(idx);
+            return getUserFeedbackDetailRes;
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+
 }

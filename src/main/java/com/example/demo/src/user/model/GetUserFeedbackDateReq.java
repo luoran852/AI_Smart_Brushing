@@ -4,12 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+
 @Getter
 @Setter
 @AllArgsConstructor
-public class GetUserFeedbackRes {
-    private int idx;
-    private int userIdx;
-    private String feedbackMsg;
-    private String mappingVideoUrl;
+public class GetUserFeedbackDateReq {
+    private int year;
+    private int month;
+    private int day;
+    private int hour;
 }
