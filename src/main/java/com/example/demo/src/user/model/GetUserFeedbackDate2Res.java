@@ -4,13 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-
 @Getter
 @Setter
 @AllArgsConstructor
-public class GetUserFeedbackDateReq {
-    private int userIdx;
-    private int year;
-    private int month;
-    private int day;
+public class GetUserFeedbackDate2Res {
+    private int existOrNot;
 }

@@ -113,9 +113,52 @@ public class UserDao {
                 getUserParams);
     }
 
-    public GetUserFeedbackDateRes getUserFeedbackDate(GetUserFeedbackDateReq getUserFeedbackDateReq, int userIdxByJwt, int type){
+
+    public GetUserFeedbackDate2Res getUserFeedbackDateExist(GetUserFeedbackDateReq getUserFeedbackDateReq, int type) {
         String getUserQuery = "";
-        int getUserParams1 = userIdxByJwt;
+        int getUserParams1 = getUserFeedbackDateReq.getUserIdx();
+        int getUserParams2 = getUserFeedbackDateReq.getYear();
+        int getUserParams3 = getUserFeedbackDateReq.getMonth();
+        int getUserParams4 = getUserFeedbackDateReq.getDay();
+
+        // 아침
+        if (type == 1) {
+            getUserQuery = "select exists(select idx, score, brushtime\n" +
+                    "from UserFeedback\n" +
+                    "where userIdx = ? and year(createdAt) = ? and month(createdAt) = ? and day(createdAt) = ? and\n" +
+                    "      (hour (createdAt) < 12 and hour (createdAt) > 3)\n" +
+                    "order by userIdx desc limit 1) as existOrNot";
+        }
+
+        // 점심
+        else if (type == 2) {
+            getUserQuery = "select exists(select idx, score, brushtime\n" +
+                    "from UserFeedback\n" +
+                    "where userIdx = ? and year(createdAt) = ? and month(createdAt) = ? and day(createdAt) = ? and\n" +
+                    "      (hour (createdAt) > 11 and hour (createdAt) < 16)\n" +
+                    "order by createdAt desc limit 1) as existOrNot";
+        }
+
+        // 저녁
+        else if (type == 3) {
+            getUserQuery = "select exists(select idx, score, brushtime\n" +
+                    "from UserFeedback\n" +
+                    "where userIdx = ? and year(createdAt) = ? and month(createdAt) = ? and day(createdAt) = ?\n" +
+                    "  and ((hour (createdAt) < 4)\n" +
+                    "   or (hour (createdAt) > 15 and hour (createdAt) < 24))\n" +
+                    "order by createdAt desc limit 1) as existOrNot";
+        }
+
+        return this.jdbcTemplate.queryForObject(getUserQuery,
+                (rs, rowNum) -> new GetUserFeedbackDate2Res(
+                        rs.getInt("existOrNot")
+                ),
+                getUserParams1, getUserParams2, getUserParams3, getUserParams4);
+    }
+
+    public GetUserFeedbackDateRes getUserFeedbackDate(GetUserFeedbackDateReq getUserFeedbackDateReq, int type){
+        String getUserQuery = "";
+        int getUserParams1 = getUserFeedbackDateReq.getUserIdx();
         int getUserParams2 = getUserFeedbackDateReq.getYear();
         int getUserParams3 = getUserFeedbackDateReq.getMonth();
         int getUserParams4 = getUserFeedbackDateReq.getDay();
@@ -124,7 +167,8 @@ public class UserDao {
         if (type == 1) {
             getUserQuery = "select idx, score, brushtime\n" +
                     "from UserFeedback\n" +
-                    "where userIdx = ? and year(createdAt) = ? and month(createdAt) = ? and day(createdAt) = ? and (hour (createdAt) < 12 and hour (createdAt) > 3)\n" +
+                    "where userIdx = ? and year(createdAt) = ? and month(createdAt) = ? and day(createdAt) = ? and\n" +
+                    "      (hour (createdAt) < 12 and hour (createdAt) > 3)\n" +
                     "order by userIdx desc limit 1";
         }
 
@@ -132,7 +176,8 @@ public class UserDao {
         else if (type == 2) {
             getUserQuery = "select idx, score, brushtime\n" +
                     "from UserFeedback\n" +
-                    "where userIdx = ? and year(createdAt) = ? and month(createdAt) = ? and day(createdAt) = ? and (hour (createdAt) > 11 and hour (createdAt) < 16)\n" +
+                    "where userIdx = ? and year(createdAt) = ? and month(createdAt) = ? and day(createdAt) = ? and\n" +
+                    "      (hour (createdAt) > 11 and hour (createdAt) < 16)\n" +
                     "order by createdAt desc limit 1";
         }
 

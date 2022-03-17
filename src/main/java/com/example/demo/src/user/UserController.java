@@ -181,6 +181,23 @@ public class UserController {
 
     /**
      * 유저 피드백 조회 (아침, 점심, 저녁)
+     * [GET] /users/feedback/time/check?type=1
+     * @return BaseResponse<GetUserFeedbackDateRes>
+     */
+    // Query String
+    @ResponseBody
+    @GetMapping("/feedback/time/check") // (GET) 58.122.17.193:9000/users/feedback/time/check?type=1
+    public BaseResponse<GetUserFeedbackDate2Res> getUserFeedbackDateExist(@RequestBody GetUserFeedbackDateReq getUserFeedbackDateReq, @RequestParam int type) {
+        try{
+            GetUserFeedbackDate2Res getUserFeedbackDate2Res = userProvider.getUserFeedbackDateExist(getUserFeedbackDateReq, type);
+            return new BaseResponse<>(getUserFeedbackDate2Res);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 유저 피드백 조회 (아침, 점심, 저녁)
      * [GET] /users/feedback/time?type=1
      * @return BaseResponse<GetUserFeedbackDateRes>
      */
@@ -190,9 +207,9 @@ public class UserController {
     public BaseResponse<GetUserFeedbackDateRes> getUserFeedbackDate(@RequestBody GetUserFeedbackDateReq getUserFeedbackDateReq, @RequestParam int type) {
         try{
             //jwt에서 idx 추출.
-            int userIdxByJwt = jwtService.getUserIdx();
+//            int userIdxByJwt = jwtService.getUserIdx();
 
-            GetUserFeedbackDateRes getUserFeedbackDateRes = userProvider.getUserFeedbackDate(getUserFeedbackDateReq, userIdxByJwt, type);
+            GetUserFeedbackDateRes getUserFeedbackDateRes = userProvider.getUserFeedbackDate(getUserFeedbackDateReq, type);
             return new BaseResponse<>(getUserFeedbackDateRes);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
