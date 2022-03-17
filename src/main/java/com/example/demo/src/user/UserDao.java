@@ -119,7 +119,6 @@ public class UserDao {
         int getUserParams2 = getUserFeedbackDateReq.getYear();
         int getUserParams3 = getUserFeedbackDateReq.getMonth();
         int getUserParams4 = getUserFeedbackDateReq.getDay();
-        int getUserParams5 = getUserFeedbackDateReq.getHour();
 
         // 아침
         if (type == 1) {
@@ -141,8 +140,8 @@ public class UserDao {
         else if (type == 3) {
             getUserQuery = "select idx, score, brushtime\n" +
                     "from UserFeedback\n" +
-                    "where userIdx = ? and year(createdAt) = ? and month(createdAt) = ? and day(createdAt) = ? and\n" +
-                    "      hour(createdAt) = ? and ((hour (createdAt) < 4)\n" +
+                    "where userIdx = ? and year(createdAt) = ? and month(createdAt) = ? and day(createdAt) = ?\n" +
+                    "  and ((hour (createdAt) < 4)\n" +
                     "   or (hour (createdAt) > 15 and hour (createdAt) < 24))\n" +
                     "order by createdAt desc limit 1";
         }
@@ -153,7 +152,7 @@ public class UserDao {
                         rs.getInt("score"),
                         rs.getInt("brushtime")
                 ),
-                getUserParams1, getUserParams2, getUserParams3, getUserParams4, getUserParams5);
+                getUserParams1, getUserParams2, getUserParams3, getUserParams4);
     }
 
     public GetUserFeedbackDetailRes getUserFeedbackDetail(int idx) {
