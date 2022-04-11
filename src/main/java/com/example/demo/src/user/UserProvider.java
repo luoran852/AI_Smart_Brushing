@@ -98,31 +98,31 @@ public class UserProvider {
         }
     }
 
-    public GetUserFeedbackDate2Res getUserFeedbackDateExist(GetUserFeedbackDateReq getUserFeedbackDateReq, int type) throws BaseException {
+    public GetUserFeedbackDate2Res getUserFeedbackDateExist(int type, int userIdx, int year, int month, int day) throws BaseException {
         try {
-            GetUserFeedbackDate2Res getUserFeedbackDate2Res = userDao.getUserFeedbackDateExist(getUserFeedbackDateReq, type);
+            GetUserFeedbackDate2Res getUserFeedbackDate2Res = userDao.getUserFeedbackDateExist(type, userIdx, year, month, day);
             return getUserFeedbackDate2Res;
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
     }
-    public GetUserFeedbackDateRes getUserFeedbackDate(GetUserFeedbackDateReq getUserFeedbackDateReq, int type) throws BaseException {
+    public GetUserFeedbackDateRes getUserFeedbackDate(int type, int userIdx, int year, int month, int day) throws BaseException {
         try {
-            GetUserFeedbackDateRes getUserFeedbackDateRes = userDao.getUserFeedbackDate(getUserFeedbackDateReq, type);
+            GetUserFeedbackDateRes getUserFeedbackDateRes = userDao.getUserFeedbackDate(type, userIdx, year, month, day);
             return getUserFeedbackDateRes;
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
     }
 
-    public GetUserFeedbackDetailRes getUserFeedbackDetail(int idx) throws BaseException {
-        try {
-            GetUserFeedbackDetailRes getUserFeedbackDetailRes = userDao.getUserFeedbackDetail(idx);
-            return getUserFeedbackDetailRes;
-        } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
-        }
-    }
+//    public GetUserFeedbackDetailRes getUserFeedbackDetail(int idx) throws BaseException {
+//        try {
+//            GetUserFeedbackDetailRes getUserFeedbackDetailRes = userDao.getUserFeedbackDetail(idx);
+//            return getUserFeedbackDetailRes;
+//        } catch (Exception exception) {
+//            throw new BaseException(DATABASE_ERROR);
+//        }
+//    }
 
 
 }

@@ -180,16 +180,17 @@ public class UserController {
     }
 
     /**
-     * 유저 피드백 조회 (아침, 점심, 저녁)
+     * 유저 피드백 조회 - 존재여부 (아침, 점심, 저녁)
      * [GET] /users/feedback/time/check?type=1
      * @return BaseResponse<GetUserFeedbackDateRes>
      */
     // Query String
     @ResponseBody
     @GetMapping("/feedback/time/check") // (GET) 58.122.17.193:9000/users/feedback/time/check?type=1
-    public BaseResponse<GetUserFeedbackDate2Res> getUserFeedbackDateExist(@RequestBody GetUserFeedbackDateReq getUserFeedbackDateReq, @RequestParam int type) {
+    public BaseResponse<GetUserFeedbackDate2Res> getUserFeedbackDateExist(@RequestParam int type, @RequestParam int userIdx,
+                                                                          @RequestParam int year, @RequestParam int month, @RequestParam int day) {
         try{
-            GetUserFeedbackDate2Res getUserFeedbackDate2Res = userProvider.getUserFeedbackDateExist(getUserFeedbackDateReq, type);
+            GetUserFeedbackDate2Res getUserFeedbackDate2Res = userProvider.getUserFeedbackDateExist(type, userIdx, year, month, day);
             return new BaseResponse<>(getUserFeedbackDate2Res);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
@@ -197,42 +198,43 @@ public class UserController {
     }
 
     /**
-     * 유저 피드백 조회 (아침, 점심, 저녁)
-     * [GET] /users/feedback/time?type=1
+     * 유저 피드백 세부 조회 (아침, 점심, 저녁)
+     * [GET] /users/feedback/time/detail?type=1
      * @return BaseResponse<GetUserFeedbackDateRes>
      */
     // Query String
     @ResponseBody
-    @GetMapping("/feedback/time") // (GET) 58.122.17.193:9000/users/feedback/time?type=1
-    public BaseResponse<GetUserFeedbackDateRes> getUserFeedbackDate(@RequestBody GetUserFeedbackDateReq getUserFeedbackDateReq, @RequestParam int type) {
+    @GetMapping("/feedback/time/detail") // (GET) 58.122.17.193:9000/users/feedback/time/detail?type=1
+    public BaseResponse<GetUserFeedbackDateRes> getUserFeedbackDate(@RequestParam int type, @RequestParam int userIdx,
+                                                                    @RequestParam int year, @RequestParam int month, @RequestParam int day) {
         try{
             //jwt에서 idx 추출.
 //            int userIdxByJwt = jwtService.getUserIdx();
 
-            GetUserFeedbackDateRes getUserFeedbackDateRes = userProvider.getUserFeedbackDate(getUserFeedbackDateReq, type);
+            GetUserFeedbackDateRes getUserFeedbackDateRes = userProvider.getUserFeedbackDate(type, userIdx, year, month, day);
             return new BaseResponse<>(getUserFeedbackDateRes);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }
     }
 
-    /**
-     * 날짜 별 세부 결과 조회
-     * [GET] /users/feedback/detail
-     * @return BaseResponse<GetUserFeedbackDetailRes>
-     */
-    // Query String
-    @ResponseBody
-    @GetMapping("/feedback/detail") // (GET) 58.122.17.193:9000/users/feedback/detail?idx=1
-    public BaseResponse<GetUserFeedbackDetailRes> getUserFeedbackDetail(@RequestParam int idx) {
-        try{
-            GetUserFeedbackDetailRes getUserFeedbackDetailRes = userProvider.getUserFeedbackDetail(idx);
-            return new BaseResponse<>(getUserFeedbackDetailRes);
-        } catch(BaseException exception){
-            return new BaseResponse<>((exception.getStatus()));
-        }
-
-    }
+//    /**
+//     * 날짜 별 세부 결과 조회
+//     * [GET] /users/feedback/detail
+//     * @return BaseResponse<GetUserFeedbackDetailRes>
+//     */
+//    // Query String
+//    @ResponseBody
+//    @GetMapping("/feedback/detail") // (GET) 58.122.17.193:9000/users/feedback/detail?idx=1
+//    public BaseResponse<GetUserFeedbackDetailRes> getUserFeedbackDetail(@RequestParam int idx) {
+//        try{
+//            GetUserFeedbackDetailRes getUserFeedbackDetailRes = userProvider.getUserFeedbackDetail(idx);
+//            return new BaseResponse<>(getUserFeedbackDetailRes);
+//        } catch(BaseException exception){
+//            return new BaseResponse<>((exception.getStatus()));
+//        }
+//
+//    }
 
 
 }

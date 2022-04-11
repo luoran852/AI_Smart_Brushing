@@ -9,6 +9,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class GetUserFeedbackDateRes {
     private int idx;
+    private String brushDate;
+    private String exactTime;
     private int score;
     private int brushtime;
+    private String feedbackMsg;
 }

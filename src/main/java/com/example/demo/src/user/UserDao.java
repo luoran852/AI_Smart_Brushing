@@ -114,16 +114,16 @@ public class UserDao {
     }
 
 
-    public GetUserFeedbackDate2Res getUserFeedbackDateExist(GetUserFeedbackDateReq getUserFeedbackDateReq, int type) {
+    public GetUserFeedbackDate2Res getUserFeedbackDateExist(int type, int userIdx, int year, int month, int day) {
         String getUserQuery = "";
-        int getUserParams1 = getUserFeedbackDateReq.getUserIdx();
-        int getUserParams2 = getUserFeedbackDateReq.getYear();
-        int getUserParams3 = getUserFeedbackDateReq.getMonth();
-        int getUserParams4 = getUserFeedbackDateReq.getDay();
+        int getUserParams1 = userIdx;
+        int getUserParams2 = year;
+        int getUserParams3 = month;
+        int getUserParams4 = day;
 
         // 아침
         if (type == 1) {
-            getUserQuery = "select exists(select idx, score, brushtime\n" +
+            getUserQuery = "select 1 as type, exists(select idx, score, brushtime\n" +
                     "from UserFeedback\n" +
                     "where userIdx = ? and year(createdAt) = ? and month(createdAt) = ? and day(createdAt) = ? and\n" +
                     "      (hour (createdAt) < 12 and hour (createdAt) > 3)\n" +
@@ -132,7 +132,7 @@ public class UserDao {
 
         // 점심
         else if (type == 2) {
-            getUserQuery = "select exists(select idx, score, brushtime\n" +
+            getUserQuery = "select 2 as type, exists(select idx, score, brushtime\n" +
                     "from UserFeedback\n" +
                     "where userIdx = ? and year(createdAt) = ? and month(createdAt) = ? and day(createdAt) = ? and\n" +
                     "      (hour (createdAt) > 11 and hour (createdAt) < 16)\n" +
@@ -141,7 +141,7 @@ public class UserDao {
 
         // 저녁
         else if (type == 3) {
-            getUserQuery = "select exists(select idx, score, brushtime\n" +
+            getUserQuery = "select 3 as type, exists(select idx, score, brushtime\n" +
                     "from UserFeedback\n" +
                     "where userIdx = ? and year(createdAt) = ? and month(createdAt) = ? and day(createdAt) = ?\n" +
                     "  and ((hour (createdAt) < 4)\n" +
@@ -151,42 +151,46 @@ public class UserDao {
 
         return this.jdbcTemplate.queryForObject(getUserQuery,
                 (rs, rowNum) -> new GetUserFeedbackDate2Res(
+                        rs.getInt("type"),
                         rs.getInt("existOrNot")
                 ),
                 getUserParams1, getUserParams2, getUserParams3, getUserParams4);
     }
 
-    public GetUserFeedbackDateRes getUserFeedbackDate(GetUserFeedbackDateReq getUserFeedbackDateReq, int type){
+    public GetUserFeedbackDateRes getUserFeedbackDate(int type, int userIdx, int year, int month, int day){
         String getUserQuery = "";
-        int getUserParams1 = getUserFeedbackDateReq.getUserIdx();
-        int getUserParams2 = getUserFeedbackDateReq.getYear();
-        int getUserParams3 = getUserFeedbackDateReq.getMonth();
-        int getUserParams4 = getUserFeedbackDateReq.getDay();
+        int getUserParams1 = userIdx;
+        int getUserParams2 = year;
+        int getUserParams3 = month;
+        int getUserParams4 = day;
 
         // 아침
         if (type == 1) {
-            getUserQuery = "select idx, score, brushtime\n" +
+            getUserQuery = "select idx, date_format(createdAt, '%Y년 %m월 %d일') as brushDate,\n" +
+                    "       date_format(createdAt, '%H시 %i분 %s초') as exactTime, score, brushtime, feedbackMsg\n" +
                     "from UserFeedback\n" +
-                    "where userIdx = ? and year(createdAt) = ? and month(createdAt) = ? and day(createdAt) = ? and\n" +
-                    "      (hour (createdAt) < 12 and hour (createdAt) > 3)\n" +
-                    "order by userIdx desc limit 1";
+                    "where userIdx = ? and year(createdAt) = ? and month(createdAt) = ? and day(createdAt) = ?\n" +
+                    "and (hour (createdAt) < 12 and hour (createdAt) > 3)\n" +
+                    "order by createdAt desc limit 1";
         }
 
         // 점심
         else if (type == 2) {
-            getUserQuery = "select idx, score, brushtime\n" +
+            getUserQuery = "select idx, date_format(createdAt, '%Y년 %m월 %d일') as brushDate,\n" +
+                    "       date_format(createdAt, '%H시 %i분 %s초') as exactTime, score, brushtime, feedbackMsg\n" +
                     "from UserFeedback\n" +
-                    "where userIdx = ? and year(createdAt) = ? and month(createdAt) = ? and day(createdAt) = ? and\n" +
-                    "      (hour (createdAt) > 11 and hour (createdAt) < 16)\n" +
+                    "where userIdx = ? and year(createdAt) = ? and month(createdAt) = ? and day(createdAt) = ?\n" +
+                    "and (hour (createdAt) > 11 and hour (createdAt) < 16)\n" +
                     "order by createdAt desc limit 1";
         }
 
         // 저녁
         else if (type == 3) {
-            getUserQuery = "select idx, score, brushtime\n" +
+            getUserQuery = "select idx, date_format(createdAt, '%Y년 %m월 %d일') as brushDate,\n" +
+                    "       date_format(createdAt, '%H시 %i분 %s초') as exactTime, score, brushtime, feedbackMsg\n" +
                     "from UserFeedback\n" +
                     "where userIdx = ? and year(createdAt) = ? and month(createdAt) = ? and day(createdAt) = ?\n" +
-                    "  and ((hour (createdAt) < 4)\n" +
+                    "and ((hour (createdAt) < 4)\n" +
                     "   or (hour (createdAt) > 15 and hour (createdAt) < 24))\n" +
                     "order by createdAt desc limit 1";
         }
@@ -194,33 +198,37 @@ public class UserDao {
         return this.jdbcTemplate.queryForObject(getUserQuery,
                 (rs, rowNum) -> new GetUserFeedbackDateRes(
                         rs.getInt("idx"),
+                        rs.getString("brushDate"),
+                        rs.getString("exactTime"),
                         rs.getInt("score"),
-                        rs.getInt("brushtime")
+                        rs.getInt("brushtime"),
+                        rs.getString("feedbackMsg")
                 ),
                 getUserParams1, getUserParams2, getUserParams3, getUserParams4);
     }
 
-    public GetUserFeedbackDetailRes getUserFeedbackDetail(int idx) {
-        String getUserQuery = "select (select date_format(createdAt, '%Y년 %m월 %d일')\n" +
-                "from UserFeedback\n" +
-                "where idx = ?\n" +
-                "order by createdAt desc limit 1) as brushDate, (select date_format(createdAt, '%H시 %i분 %s초')\n" +
-                "from UserFeedback\n" +
-                "where idx = ?\n" +
-                "order by createdAt desc limit 1) as brushTime, score, feedbackMsg\n" +
-                "from UserFeedback\n" +
-                "where idx = ?";
-
-        int getUserParams = idx;
-        return this.jdbcTemplate.queryForObject(getUserQuery,
-                (rs, rowNum) -> new GetUserFeedbackDetailRes(
-                        rs.getString("brushDate"),
-                        rs.getString("brushTime"),
-                        rs.getInt("score"),
-                        rs.getString("feedbackMsg")
-                ),
-                getUserParams, getUserParams, getUserParams);
-    }
+//    public GetUserFeedbackDetailRes getUserFeedbackDetail(int idx) {
+//        String getUserQuery = "select idx, (select date_format(createdAt, '%Y년 %m월 %d일')\n" +
+//                "from UserFeedback\n" +
+//                "where idx = ?\n" +
+//                "order by createdAt desc limit 1) as brushDate, (select date_format(createdAt, '%H시 %i분 %s초')\n" +
+//                "from UserFeedback\n" +
+//                "where idx = ?\n" +
+//                "order by createdAt desc limit 1) as brushTime, score, feedbackMsg\n" +
+//                "from UserFeedback\n" +
+//                "where idx = ?";
+//
+//        int getUserParams = idx;
+//        return this.jdbcTemplate.queryForObject(getUserQuery,
+//                (rs, rowNum) -> new GetUserFeedbackDetailRes(
+//                        rs.getInt("idx"),
+//                        rs.getString("brushDate"),
+//                        rs.getString("brushTime"),
+//                        rs.getInt("score"),
+//                        rs.getString("feedbackMsg")
+//                ),
+//                getUserParams, getUserParams, getUserParams);
+//    }
 
 
 }

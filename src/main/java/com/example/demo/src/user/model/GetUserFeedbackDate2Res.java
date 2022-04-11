@@ -8,5 +8,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class GetUserFeedbackDate2Res {
+    private int type;
     private int existOrNot;
 }
